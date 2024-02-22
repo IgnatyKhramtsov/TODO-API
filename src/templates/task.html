@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block head %}
+
+<script>
+    const searchForOperation = () => {
+        window.location.href = `/pages/base`;
+    }
+    async function postData() {
+        let taskA = document.getElementById("task").value;
+        let response = await fetch("http://127.0.0.1:8000/tasks/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                task: taskA,
+            })
+        });
+        let data = await response.json();
+        alert(data["message"]);
+        searchForOperation()
+    }
+
+    async function delTask(event){
+        console.log(this,arguments)
+        let response = await fetch("http://127.0.0.1:8000/tasks/task/" + event.target.dataset.task_id, {
+            method: "DELETE",
+            });
+        let data = await response.json();
+        searchForOperation()
+    }
+</script>
+{% endblock %}
+
+
+{% block content %}
+<div class="input-container">
+    <input id="task" type="text" placeholder="Введите задачу">
+    <button onclick="postData()">Добавить</button>
+</div>
+
+{% for task in tasks %}
+    <div class="todo-list">
+        <div class="todo-item">
+            <span>{{ task.task }}</span>
+            <span>{{ task.status.value }}</span>
+            <button>Редактировать</button>
+            <button data-task_id="{{ task.id }}" onclick="delTask(event)">Удалить</button>
+        </div>
+    </div>
+{%endfor%}
+
+{% endblock %}
